@@ -19,8 +19,7 @@
     "aic": "./dist/cli.mjs"
   },
   "dependencies": {
-    "@dqbd/tiktoken": "^1.0.2",
-    "elminson-aicommits": "^0.0.0-semantic-release"
+    "@dqbd/tiktoken": "^1.0.2"
   },
   "devDependencies": {
     "lint-staged": "^14.0.1"
