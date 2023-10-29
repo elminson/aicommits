@@ -4,7 +4,7 @@
     <h1 align="center">AI Commits</h1>
   </div>
 	<p>A CLI that writes your git commit messages for you with AI. Never write a commit message again.</p>
-	<a href="https://www.npmjs.com/package/aicommits"><img src="https://img.shields.io/npm/v/aicommits" alt="Current version"></a>
+	<a href="https://www.npmjs.com/package/elminson-aicommits"><img src="https://img.shields.io/npm/v/aicommits" alt="Current version"></a>
 </div>
 
 ---
@@ -17,7 +17,7 @@
 1. Install _aicommits_:
 
     ```sh
-    npm install -g aicommits
+    npm install -g elminson-aicommits
     ```
 
 2. Retrieve your API key from [OpenAI](https://platform.openai.com/account/api-keys)
