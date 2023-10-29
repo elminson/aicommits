@@ -1,6 +1,6 @@
 {
   "name": "elminson-aicommits",
-  "version": "0.0.0-semantic-release",
+  "version": "1.0.1",
   "description": "Writes your git commit messages for you with AI",
   "keywords": [
     "ai",
@@ -8,15 +8,18 @@
     "commit"
   ],
   "license": "MIT",
-  "repository": "elminson/aicommits",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elminson/aicommits.git"
+  },
   "author": "Elminson De Oleo (@elminson) (fork from Nutlope/aicommits)",
   "type": "module",
   "files": [
     "dist"
   ],
   "bin": {
-    "aicommits": "./dist/cli.mjs",
-    "aic": "./dist/cli.mjs"
+    "aicommits": "dist/cli.mjs",
+    "aic": "dist/cli.mjs"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2"
