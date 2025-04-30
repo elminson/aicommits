@@ -13,25 +13,39 @@
 
 > The minimum supported version of Node.js is the latest v14. Check your Node.js version with `node --version`.
 
-
 1. Install _aicommits_:
 
     ```sh
     npm install -g elminson-aicommits
     ```
 
-2. Retrieve your API key from [OpenAI](https://platform.openai.com/account/api-keys)
+2. Choose and configure your AI provider:
 
-    > Note: If you haven't already, you'll have to create an account and set up billing.
+    ### OpenAI (Default)
+    1. Retrieve your API key from [OpenAI](https://platform.openai.com/account/api-keys)
+    2. Set the key:
+        ```sh
+        aicommits config set OPENAI_KEY=<your token>
+        ```
 
-3. Set the key so aicommits can use it:
+    ### DeepSeek
+    1. Retrieve your API key from [DeepSeek](https://platform.deepseek.com/)
+    2. Configure DeepSeek:
+        ```sh
+        aicommits config set AI_PROVIDER=deepseek
+        aicommits config set DEEPSEEK_KEY=<your token>
+        ```
 
-    ```sh
-    aicommits config set OPENAI_KEY=<your token>
-    ```
+    ### Ollama (Local)
+    1. Install and start [Ollama](https://ollama.ai/)
+    2. Configure Ollama:
+        ```sh
+        aicommits config set AI_PROVIDER=ollama
+        # Optional: Set custom Ollama endpoint if not running locally
+        aicommits config set OLLAMA_BASE_URL=http://your-ollama-server:11434
+        ```
 
-    This will create a `.aicommits` file in your home directory.
-
+This will create a `.aicommits` file in your home directory.
 
 ### Upgrading
 
@@ -63,7 +77,7 @@ For example, you can stage all changes in tracked files with as you commit:
 aicommits --all # or -a
 ```
 
-> 👉 **Tip:** Use the `aic` alias if `aicommits` is too long for you.
+> 👉 **Tip:** Use the `aic` alias if `aicommits` is too long for you.
 
 #### Generate multiple recommendations
 
@@ -157,11 +171,44 @@ aicommits config set OPENAI_KEY=<your-api-key> generate=3 locale=en
 ```
 
 ### Options
+#### AI_PROVIDER
+
+Default: `openai`
+
+The AI provider to use for generating commit messages. Available options:
+- `openai`: Uses OpenAI's GPT models (requires `OPENAI_KEY`)
+- `deepseek`: Uses DeepSeek's models (requires `DEEPSEEK_KEY`)
+- `ollama`: Uses locally running Ollama models (requires Ollama to be running)
+
+To change the provider:
+```sh
+aicommits config set AI_PROVIDER=deepseek
+```
+
 #### OPENAI_KEY
 
-Required
+Optional (Required when using `AI_PROVIDER=openai`)
 
 The OpenAI API key. You can retrieve it from [OpenAI API Keys page](https://platform.openai.com/account/api-keys).
+
+#### DEEPSEEK_KEY
+
+Optional (Required when using `AI_PROVIDER=deepseek`)
+
+The DeepSeek API key. You can retrieve it from [DeepSeek's platform](https://platform.deepseek.com/).
+
+#### OLLAMA_BASE_URL
+
+Optional (Used when `AI_PROVIDER=ollama`)
+
+Default: `http://localhost:11434`
+
+The URL where your Ollama instance is running. You only need to set this if you're running Ollama on a different host or port.
+
+Example:
+```sh
+aicommits config set OLLAMA_BASE_URL=http://my-ollama-server:11434
+```
 
 #### locale
 Default: `en`
@@ -190,10 +237,37 @@ aicommits config set proxy=
 
 Default: `gpt-3.5-turbo`
 
-The Chat Completions (`/v1/chat/completions`) model to use. Consult the list of models available in the [OpenAI Documentation](https://platform.openai.com/docs/models/model-endpoint-compatibility).
+The model to use for generating commit messages. The available models depend on your chosen AI provider:
 
-> Tip: If you have access, try upgrading to [`gpt-4`](https://platform.openai.com/docs/models/gpt-4) for next-level code analysis. It can handle double the input size, but comes at a higher cost. Check out OpenAI's website to learn more.
+##### OpenAI
+Any Chat Completions (`/v1/chat/completions`) model. Consult the list of models available in the [OpenAI Documentation](https://platform.openai.com/docs/models/model-endpoint-compatibility).
 
+> Tip: If you have access, try upgrading to [`gpt-4`](https://platform.openai.com/docs/models/gpt-4) for next-level code analysis. It can handle double the input size, but comes at a higher cost.
+
+##### DeepSeek
+DeepSeek's chat models, such as:
+- `deepseek-chat-1.3b`
+- `deepseek-coder-6.7b`
+- `deepseek-coder-33b`
+
+##### Ollama
+Any model you have pulled locally with Ollama, such as:
+- `codellama`
+- `deepseek-coder`
+- `mistral`
+- `llama2`
+
+Example:
+```sh
+# For OpenAI
+aicommits config set model=gpt-4
+
+# For DeepSeek
+aicommits config set model=deepseek-coder-33b
+
+# For Ollama
+aicommits config set model=codellama
+```
 
 #### timeout
 The timeout for network requests to the OpenAI API in milliseconds.
