@@ -5,6 +5,7 @@ import ini from 'ini';
 import type { TiktokenModel } from '@dqbd/tiktoken';
 import { fileExists } from './fs.js';
 import { KnownError } from './error.js';
+import { AIProviderFactory } from './ai/factory.js';
 
 const commitTypes = ['', 'conventional'] as const;
 
@@ -24,14 +25,38 @@ const parseAssert = (
 };
 
 const configParsers = {
+	AI_PROVIDER(provider?: string) {
+		if (!provider) {
+			return 'openai';
+		}
+
+		const availableProviders = AIProviderFactory.getAvailableProviders();
+		parseAssert('AI_PROVIDER', availableProviders.includes(provider.toLowerCase()), `Must be one of: ${availableProviders.join(', ')}`);
+
+		return provider.toLowerCase();
+	},
 	OPENAI_KEY(key?: string) {
 		if (!key) {
-			throw new KnownError('Please set your OpenAI API key via `aicommits config set OPENAI_KEY=<your token>`');
+			return undefined;
 		}
 		parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 		// Key can range from 43~51 characters. There's no spec to assert this.
 
 		return key;
+	},
+	DEEPSEEK_KEY(key?: string) {
+		if (!key) {
+			return undefined;
+		}
+		parseAssert('DEEPSEEK_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
+		return key;
+	},
+	OLLAMA_BASE_URL(url?: string) {
+		if (!url) {
+			return 'http://localhost:11434';
+		}
+		parseAssert('OLLAMA_BASE_URL', /^https?:\/\//.test(url), 'Must be a valid URL');
+		return url;
 	},
 	locale(locale?: string) {
 		if (!locale) {

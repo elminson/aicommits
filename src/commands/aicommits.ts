@@ -12,7 +12,7 @@ import {
 	getCurrentBranchName,
 } from '../utils/git.js';
 import { getConfig } from '../utils/config.js';
-import { generateCommitMessage } from '../utils/openai.js';
+import { AIProviderFactory } from '../utils/ai/factory.js';
 import { KnownError, handleCliError } from '../utils/error.js';
 
 export default async (
@@ -46,7 +46,10 @@ export default async (
 
 	const { env } = process;
 	const config = await getConfig({
+		AI_PROVIDER: env.AI_PROVIDER,
 		OPENAI_KEY: env.OPENAI_KEY || env.OPENAI_API_KEY,
+		DEEPSEEK_KEY: env.DEEPSEEK_KEY,
+		OLLAMA_BASE_URL: env.OLLAMA_BASE_URL,
 		proxy: env.https_proxy || env.HTTPS_PROXY || env.http_proxy || env.HTTP_PROXY,
 		generate: generate?.toString(),
 		type: commitType?.toString(),
@@ -56,8 +59,19 @@ export default async (
 	s.start('The AI is analyzing your changes');
 	let messages: string[];
 	try {
-		messages = await generateCommitMessage(
-			config.OPENAI_KEY,
+		const provider = AIProviderFactory.getProvider({
+			name: config.AI_PROVIDER,
+			apiKey: config.AI_PROVIDER === 'openai' ? config.OPENAI_KEY : 
+				config.AI_PROVIDER === 'deepseek' ? config.DEEPSEEK_KEY : undefined,
+			model: config.model,
+			baseUrl: config.AI_PROVIDER === 'ollama' ? config.OLLAMA_BASE_URL : undefined,
+			timeout: config.timeout,
+			proxy: config.proxy,
+		});
+
+		messages = await provider.generateCommitMessage(
+			config.AI_PROVIDER === 'openai' ? config.OPENAI_KEY! : 
+			config.AI_PROVIDER === 'deepseek' ? config.DEEPSEEK_KEY! : '',
 			config.model,
 			config.locale,
 			staged.diff,
